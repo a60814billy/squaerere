@@ -1,7 +1,10 @@
 # Simple DNS server written by go language
 
-This project is a simple DNS server POC. It use map to define DNS record.
-Currency not supports recursive query and multi-queries.
+The project is a POC of DNS server. Currency only support few dns server feature.
+
+- Listen on UDP port 53
+- Support one Server Query
+- No Query Type check
 
 ## How to use
 
