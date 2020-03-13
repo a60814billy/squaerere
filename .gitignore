@@ -1,0 +1,5 @@
+# jetbrains ide
+.idea/
+
+# build artifact
+dist/
