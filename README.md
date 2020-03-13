@@ -37,3 +37,7 @@ Name:	abc.raccoon.me
 Address: 127.0.0.1
 ```
 
+## References
+
+- [DNS related RFCs list](https://www.statdns.com/rfc/)
+- [RFC 1035 - DOMAIN NAMES - IMPLEMENTATION AND SPECIFICATION](https://tools.ietf.org/html/rfc1035)
