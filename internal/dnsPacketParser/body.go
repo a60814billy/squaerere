@@ -22,7 +22,6 @@ type AnswerRecord struct {
 }
 
 func (A *AnswerRecord) ToBytes() []byte {
-
 	A.resourceDataLength = uint16(len(A.ResourceData))
 
 	var res []byte
