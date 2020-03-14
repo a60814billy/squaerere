@@ -8,10 +8,16 @@ The project is a POC of DNS server. Currency only support few dns server feature
 
 ## How to use
 
+### requirements
+
+- go 1.14 
+- make
+
 ### Build server
 ```
 $ make
-$ sudo ./dist/dns-server
+go build -o ./dist/squaerere ./cmd/main.go
+$ make run
 ```
 
 ### Test
