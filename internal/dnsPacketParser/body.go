@@ -2,6 +2,7 @@ package dnsPacketParser
 
 import (
 	"encoding/binary"
+	"errors"
 	"strconv"
 	"strings"
 )
@@ -46,9 +47,13 @@ func domainToBytes(domain string) []byte {
 	return r
 }
 
-func ParseQuerySection(body []byte) QueryRecord {
+func ParseQuerySection(body []byte) (*QueryRecord, error) {
 	var domain []string
 	var idx int = 0
+
+	if len(body) <= 0 {
+		return nil, errors.New("invalid query section: size not valid")
+	}
 
 	for {
 		labelLength := int(body[idx : idx+1][0])
@@ -56,20 +61,27 @@ func ParseQuerySection(body []byte) QueryRecord {
 		if labelLength == 0 {
 			break
 		}
+		if len(body) < idx + labelLength {
+			return nil, errors.New("invalid query section: cannot parse label")
+		}
 		labelName := body[idx : idx+labelLength]
 		domain = append(domain, string(labelName))
 		idx += labelLength
 	}
 
+	if len(body) < idx + 4 {
+		return nil, errors.New("invalid query section: cannot parse type or class")
+	}
+
 	domainName := strings.Join(domain, ".")
 
-	res := QueryRecord{
+	res := &QueryRecord{
 		Domain: domainName,
 		Type:   binary.BigEndian.Uint16(body[idx : idx+2]),
 		Class:  binary.BigEndian.Uint16(body[idx+2 : idx+4]),
 	}
 
-	return res
+	return res, nil
 }
 
 func ParseIP(s string) []byte {

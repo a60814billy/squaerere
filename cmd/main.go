@@ -33,7 +33,7 @@ func main() {
 	defer udpServer.Close()
 
 	for {
-		buf := make([]byte, 1024)
+		buf := make([]byte, 1500) // if MTU = 1500 bytes, the UDP packet's maximum size is 1480 bytes
 		n, addr, err := udpServer.ReadFrom(buf)
 		if err != nil {
 			log.Printf("%s\n", err.Error())
@@ -44,13 +44,26 @@ func main() {
 }
 
 func server(srv *net.UDPConn, address net.Addr, buf []byte) {
+	if len(buf) < 12 {
+		fmt.Fprintf(os.Stdout, "the packet size is too small: %d, %x\n", len(buf), buf)
+		return
+	}
+
 	var header [12]byte
 	copy(header[:], buf[0:12])
-	queryHeader := dnsPacketParser.ParseDnsQueryHeader(header)
-	queryRecord := dnsPacketParser.ParseQuerySection(buf[12:])
+	queryHeader, err := dnsPacketParser.ParseDnsQueryHeader(header)
+	if err != nil {
+		fmt.Fprintf(os.Stdout, "%s, %x\n", err.Error(), buf)
+		return
+	}
+	queryRecord, err := dnsPacketParser.ParseQuerySection(buf[12:])
+	if err != nil {
+		fmt.Fprintf(os.Stdout, "%s, %x\n", err.Error(), buf)
+		return
+	}
 
 	if DEBUG {
-		printPacket(queryHeader, buf, queryRecord)
+		printPacket(queryHeader, queryRecord, buf)
 	}
 
 	respIP := ""
@@ -88,7 +101,7 @@ func server(srv *net.UDPConn, address net.Addr, buf []byte) {
 	srv.WriteTo(respPacket, address)
 }
 
-func printPacket(queryHeader dnsPacketParser.DnsQueryHeader, buf []byte, queryRecord dnsPacketParser.QueryRecord) {
+func printPacket(queryHeader *dnsPacketParser.DnsQueryHeader, queryRecord *dnsPacketParser.QueryRecord, buf []byte, ) {
 	fmt.Fprintf(os.Stdout, "ID: %X (%d)\n", queryHeader.ID, queryHeader.ID)
 	fmt.Fprintf(os.Stdout, "QR: %d\n", queryHeader.QR)
 	fmt.Fprintf(os.Stdout, "Opcode: %d\n", queryHeader.OpCode)

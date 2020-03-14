@@ -2,6 +2,7 @@ package dnsPacketParser
 
 import (
 	"encoding/binary"
+	"errors"
 )
 
 /**
@@ -22,7 +23,7 @@ The header contains the following fields:
     +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
     |                    ARCOUNT                    |
     +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
- */
+*/
 type DnsQueryHeader struct {
 	ID      uint16
 	QR      uint8
@@ -57,8 +58,8 @@ func (d *DnsQueryHeader) ToBytes() []byte {
 	return r
 }
 
-func ParseDnsQueryHeader(header [12]byte) DnsQueryHeader {
-	res := DnsQueryHeader{}
+func ParseDnsQueryHeader(header [12]byte) (*DnsQueryHeader, error) {
+	res := &DnsQueryHeader{}
 	res.ID = binary.BigEndian.Uint16(header[0:2])
 	res.QR = header[2:3][0] & 128 >> 7     // & 0x10 0=> query, 1=> response
 	res.OpCode = header[2:3][0] & 120 >> 3 // & 0x78
@@ -75,5 +76,9 @@ func ParseDnsQueryHeader(header [12]byte) DnsQueryHeader {
 	res.NSCount = binary.BigEndian.Uint16(header[8:10])
 	res.ARCount = binary.BigEndian.Uint16(header[10:12])
 
-	return res
+	if res.Z != 0 {
+		return nil, errors.New("invalid DNS header, the Z field must be zero")
+	}
+
+	return res, nil
 }
