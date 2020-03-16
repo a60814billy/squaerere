@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/a60814billy/squaerere/internal/dnsPacketParser"
+	"github.com/a60814billy/squaerere/pkg/dnsPacketParser"
 	"log"
 	"net"
 	"os"
