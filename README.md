@@ -1,5 +1,7 @@
 # Simple DNS server written by go language
 
+[![hackmd-github-sync-badge](https://stage.hackmd.io/SA0Sg_MmT7qBCczdk4jBsg/badge)](https://stage.hackmd.io/SA0Sg_MmT7qBCczdk4jBsg)
+
 The project is a POC of DNS server. Currency only support few dns server feature.
 
 - Listen on UDP port 53
